@@ -4,7 +4,6 @@ name: Build and deploy
 on:
   push:
     branches: [main]
-    paths-ignore: ["k8s/overlays/prod/kustomization.yaml", "README.md"]
   workflow_dispatch:
 
 permissions:
