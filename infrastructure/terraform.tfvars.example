@@ -1,0 +1,4 @@
+region          = "ap-south-1"
+project         = "atlas-todos"
+gitops_repo_url = "https://github.com/YOUR_ORG/YOUR_REPOSITORY.git"
+github_repository = "YOUR_ORG/YOUR_REPOSITORY"

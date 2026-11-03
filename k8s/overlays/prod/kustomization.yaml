@@ -1,0 +1,10 @@
+namespace: todo
+resources:
+  - ../../base
+images:
+  - name: TODO_API_IMAGE
+    newName: REPLACE_AT_DEPLOY_TIME/api
+    newTag: latest
+  - name: TODO_WEB_IMAGE
+    newName: REPLACE_AT_DEPLOY_TIME/web
+    newTag: latest

@@ -1,0 +1,27 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+tfplan
+.terraformrc
+terraform.rc
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Keep example tfvars if present
+*.tfvars
+!terraform.tfvars.example
+
+# Node
+node_modules/
+dist/
+build/
+
+# Env
+.env
+.env.local

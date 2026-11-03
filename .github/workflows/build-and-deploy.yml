@@ -1,0 +1,49 @@
+name: Build and deploy
+# Builds immutable ECR images, then lets Argo CD reconcile the GitOps change.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["k8s/overlays/prod/kustomization.yaml", "README.md"]
+
+permissions:
+  id-token: write
+  contents: write
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_API_REPOSITORY: ${{ vars.ECR_API_REPOSITORY }}
+  ECR_WEB_REPOSITORY: ${{ vars.ECR_WEB_REPOSITORY }}
+
+jobs:
+  build-and-promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push images
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          docker build -t "$ECR_API_REPOSITORY:$TAG" server
+          docker build -t "$ECR_WEB_REPOSITORY:$TAG" client
+          docker push "$ECR_API_REPOSITORY:$TAG"
+          docker push "$ECR_WEB_REPOSITORY:$TAG"
+      - uses: mikefarah/yq@v4.44.3
+      - name: Promote immutable images for Argo CD
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          yq -i '(.images[] | select(.name == "TODO_API_IMAGE").newName) = strenv(ECR_API_REPOSITORY)' k8s/overlays/prod/kustomization.yaml
+          yq -i '(.images[] | select(.name == "TODO_API_IMAGE").newTag) = strenv(TAG)' k8s/overlays/prod/kustomization.yaml
+          yq -i '(.images[] | select(.name == "TODO_WEB_IMAGE").newName) = strenv(ECR_WEB_REPOSITORY)' k8s/overlays/prod/kustomization.yaml
+          yq -i '(.images[] | select(.name == "TODO_WEB_IMAGE").newTag) = strenv(TAG)' k8s/overlays/prod/kustomization.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add k8s/overlays/prod/kustomization.yaml
+          git commit -m "chore(deploy): promote $TAG" || exit 0
+          git push
