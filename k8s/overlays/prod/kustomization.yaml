@@ -3,8 +3,8 @@ resources:
   - ../../base
 images:
   - name: TODO_API_IMAGE
-    newName: REPLACE_AT_DEPLOY_TIME/api
-    newTag: latest
+    newName: 258109618886.dkr.ecr.ap-south-1.amazonaws.com/practice-code/api
+    newTag: ebcf113cb800edbb846fa8dac2a98af2690f4c55
   - name: TODO_WEB_IMAGE
-    newName: REPLACE_AT_DEPLOY_TIME/web
-    newTag: latest
+    newName: 258109618886.dkr.ecr.ap-south-1.amazonaws.com/practice-code/web
+    newTag: ebcf113cb800edbb846fa8dac2a98af2690f4c55
